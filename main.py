@@ -1,5 +1,6 @@
 import flet as ft
 from producto import Producto
+from pedido import Pedido
 
 def main(page: ft.Page) -> None:
     # General settings of the window
@@ -39,15 +40,20 @@ def ConsumidorView(page: ft.Page) -> None:
         {"name": "REBANADA DE FLAN", "icon_name": ft.Icons.CAKE_OUTLINED},
         {"name": "DOCENA DE GALLETAS", "icon_name": ft.Icons.COOKIE_OUTLINED},
         {"name": "BROWNIE", "icon_name": ft.Icons.BREAKFAST_DINING},
-        {"name": "CAFÉ CAPPUCCINO", "icon_name": ft.Icons.COFFEE_OUTLINED},
         {"name": "CAFÉ AMERICANO", "icon_name": ft.Icons.COFFEE_OUTLINED},
         {"name": "MALTEADA DE FRESA", "icon_name": ft.Icons.COFFEE_MAKER},
-        {"name": "MALTEADA DE CHOCOLATE", "icon_name": ft.Icons.COFFEE_MAKER},
-        {"name": "SMOOTHIE DE MANZANA", "icon_name": ft.Icons.BRUNCH_DINING_SHARP},
-        {"name": "SMOOTHIE DE MORA AZUL", "icon_name": ft.Icons.BRUNCH_DINING_SHARP}
+        {"name": "SMOOTHIE MORA AZUL", "icon_name": ft.Icons.BRUNCH_DINING_SHARP},
     ]
     
-    def get_options():
+    pastel = Producto('pastel', 50, 0)
+    flan = Producto('flan', 50, 0)
+    galletas = Producto('galletas', 120, 0)
+    brownie = Producto('brownie', 80, 0)
+    coffe = Producto('café', 40, 0)
+    malteada = Producto('malteada', 50, 0)
+    smoothie = Producto('smoothie', 60, 0)
+    
+    def get_options() -> list:
         options = []
         for icon in icons:
             options.append(
@@ -56,14 +62,64 @@ def ConsumidorView(page: ft.Page) -> None:
         return options
     
     def addRow(e) -> None:
-        tab.rows.append(
-            ft.DataRow(
-                cells=[
-                    ft.DataCell(ft.Text(selector.value)),
-                    ft.DataCell(ft.Text("1"))
-                ]
+        
+        cantidad = 0
+        x = False
+        if selector.value == "REBANADA DE PASTEL":
+            cantidad = pastel.increment()
+            pastel.id = len(Pedido.elementos)
+            x = Pedido.addElement(pastel)
+        elif selector.value == 'REBANADA DE FLAN':
+            cantidad = flan.increment()
+            flan.id = len(Pedido.elementos)
+            x = Pedido.addElement(flan)
+        elif selector.value == 'DOCENA DE GALLETAS':
+            cantidad = galletas.increment()
+            galletas.id = len(Pedido.elementos)
+            x = Pedido.addElement(galletas)
+        elif selector.value == 'BROWNIE':
+            cantidad = brownie.increment()
+            brownie.id = len(Pedido.elementos)
+            x = Pedido.addElement(brownie)
+        elif selector.value == 'CAFÉ AMERICANO':
+            coffe.id = len(Pedido.elementos)
+            cantidad = coffe.increment()
+            x = Pedido.addElement(coffe)
+        elif selector.value == 'MALTEADA DE FRESA':
+            cantidad = malteada.increment()
+            malteada.id = len(Pedido.elementos)
+            x = Pedido.addElement(malteada)
+        elif selector.value == 'SMOOTHIE MORA AZUL':
+            smoothie.id = len(Pedido.elementos)
+            cantidad = smoothie.increment()
+            x = Pedido.addElement(smoothie)
+        
+        if selector.value is not None and x:
+            tab.visible = True
+            tab.rows.append(
+                ft.DataRow(
+                    cells=[
+                        ft.DataCell(ft.Text(value=selector.value)),
+                        ft.DataCell(ft.Text(value=str(cantidad)))
+                    ]
+                )
             )
-        )
+        elif selector.value is not None:
+            if selector.value == "REBANADA DE PASTEL":
+                tab.rows[pastel.id-1].cells[1] = ft.DataCell(ft.Text(value=str(pastel.cantidad)))
+            elif selector.value == 'REBANADA DE FLAN':
+                tab.rows[flan.id-1].cells[1] = ft.DataCell(ft.Text(value=str(flan.cantidad)))
+            elif selector.value == 'DOCENA DE GALLETAS':
+                tab.rows[galletas.id-1].cells[1] = ft.DataCell(ft.Text(value=str(galletas.cantidad)))
+            elif selector.value == 'BROWNIE':
+                tab.rows[brownie.id-1].cells[1] = ft.DataCell(ft.Text(value=str(brownie.cantidad)))
+            elif selector.value == 'CAFÉ AMERICANO':
+                tab.rows[coffe.id-1].cells[1] = ft.DataCell(ft.Text(value=str(coffe.cantidad)))
+            elif selector.value == 'MALTEADA DE FRESA':
+                tab.rows[malteada.id-1].cells[1] = ft.DataCell(ft.Text(value=str(malteada.cantidad)))
+            elif selector.value == 'SMOOTHIE MORA AZUL':
+                tab.rows[smoothie.id-1].cells[1] = ft.DataCell(ft.Text(value=str(smoothie.cantidad)))
+        
         page.update()
     
     selector = ft.Dropdown(
@@ -77,11 +133,13 @@ def ConsumidorView(page: ft.Page) -> None:
     )
     
     tab = ft.DataTable(
+        visible= False,
         heading_row_color=ft.Colors.GREY_100,
         columns=[
             ft.DataColumn(ft.Text(value='Producto')),
             ft.DataColumn(ft.Text(value='Cantidad'), numeric=True)
-        ]
+        ],
+        rows=[]
     )
     
     texto = ft.Text(value='')
@@ -109,28 +167,28 @@ def ConsumidorView(page: ft.Page) -> None:
                                         cells=[
                                             ft.DataCell(ft.Text("REBANADA DE PASTEL")),
                                             ft.DataCell(ft.Text("TRES LECHES")),
-                                            ft.DataCell(ft.Text("$ 35")),
+                                            ft.DataCell(ft.Text("$ 50")),
                                         ],
                                     ),
                                     ft.DataRow(
                                         cells=[
                                             ft.DataCell(ft.Text("REBANADA DE FLAN")),
                                             ft.DataCell(ft.Text("NAPOLITANO")),
-                                            ft.DataCell(ft.Text("$ 35")),
+                                            ft.DataCell(ft.Text("$ 50")),
                                         ],
                                     ),
                                     ft.DataRow(
                                         cells=[
                                             ft.DataCell(ft.Text("DOCENA DE GALLETAS")),
                                             ft.DataCell(ft.Text("ALMENDRAS")),
-                                            ft.DataCell(ft.Text("$ 100")),
+                                            ft.DataCell(ft.Text("$ 120")),
                                         ],
                                     ),
                                     ft.DataRow(
                                         cells=[
                                             ft.DataCell(ft.Text("BROWNIE")),
                                             ft.DataCell(ft.Text("CHOCOLATE")),
-                                            ft.DataCell(ft.Text("$ 60"))
+                                            ft.DataCell(ft.Text("$ 80"))
                                         ]
                                     )
                                 ],
