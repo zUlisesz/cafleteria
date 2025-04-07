@@ -27,7 +27,6 @@ def ConsumidorView(page: ft.Page) -> None:
     
     # Clear the page before adding new content
     page.controls.clear()
-    
     page.add(ft.Text(
         value='GENERANDO MI PEDIDO',
         size=40,
@@ -52,6 +51,7 @@ def ConsumidorView(page: ft.Page) -> None:
     coffe = Producto('café', 40, 0)
     malteada = Producto('malteada', 50, 0)
     smoothie = Producto('smoothie', 60, 0)
+    carro = [pastel , flan, galletas, brownie, coffe, malteada, smoothie]
     
     def get_options() -> list:
         options = []
@@ -96,6 +96,7 @@ def ConsumidorView(page: ft.Page) -> None:
         
         if selector.value is not None and x:
             tab.visible = True
+            cuenta.visible = True
             tab.rows.append(
                 ft.DataRow(
                     cells=[
@@ -119,7 +120,9 @@ def ConsumidorView(page: ft.Page) -> None:
                 tab.rows[malteada.id-1].cells[1] = ft.DataCell(ft.Text(value=str(malteada.cantidad)))
             elif selector.value == 'SMOOTHIE MORA AZUL':
                 tab.rows[smoothie.id-1].cells[1] = ft.DataCell(ft.Text(value=str(smoothie.cantidad)))
-        
+         
+         
+        cuenta.value = 'Total: ${}'.format( Pedido.calcularCarrito(carro))
         page.update()
     
     selector = ft.Dropdown(
@@ -129,7 +132,7 @@ def ConsumidorView(page: ft.Page) -> None:
         leading_icon=ft.Icons.SEARCH,
         options=get_options(),
         autofocus=True,
-        width=260
+        width=270
     )
     
     tab = ft.DataTable(
@@ -142,7 +145,11 @@ def ConsumidorView(page: ft.Page) -> None:
         rows=[]
     )
     
-    texto = ft.Text(value='')
+    cuenta = ft.Text(
+                        value="TOTAL: {}".format(Pedido.calcularCarrito(carro)),
+                        visible= False,
+                        weight= ft.FontWeight.W_500
+                    )
     
     # Menu de postres y bebidas
     page.add(
@@ -205,21 +212,21 @@ def ConsumidorView(page: ft.Page) -> None:
                                     ft.DataRow(
                                         cells=[
                                             ft.DataCell(ft.Text("CAFÉ")),
-                                            ft.DataCell(ft.Text("CAPPUCCINO, AMERICANO")),
+                                            ft.DataCell(ft.Text("AMERICANO")),
                                             ft.DataCell(ft.Text("$ 40")),
                                         ],
                                     ),
                                     ft.DataRow(
                                         cells=[
                                             ft.DataCell(ft.Text("MALTEADA")),
-                                            ft.DataCell(ft.Text("CHOCOLATE, FRESA")),
+                                            ft.DataCell(ft.Text("FRESA")),
                                             ft.DataCell(ft.Text("$ 50")),
                                         ],
                                     ),
                                     ft.DataRow(
                                         cells=[
                                             ft.DataCell(ft.Text("SMOOTHIE")),
-                                            ft.DataCell(ft.Text("MANZANA, MORA AZUL")),
+                                            ft.DataCell(ft.Text("MORA AZUL")),
                                             ft.DataCell(ft.Text("$ 60")),
                                         ],
                                     ),
@@ -235,9 +242,9 @@ def ConsumidorView(page: ft.Page) -> None:
                     content=ft.Column(
                         spacing=40,
                         controls=[
-                            ft.Text(value='AÑADA LOS ALIMENTOS DE SU AGRADO', weight=ft.FontWeight.W_400),
+                            ft.Text(value='AÑADA LOS ALIMENTOS DE SU AGRADO', weight=ft.FontWeight.W_500),
                             selector,
-                            ft.ElevatedButton(text='AÑADIR AL CARRITO', on_click=addRow, width=300)
+                            ft.ElevatedButton(text='AÑADIR AL CARRITO', on_click=addRow, width=270)
                         ],
                         alignment=ft.MainAxisAlignment.START,
                         horizontal_alignment=ft.CrossAxisAlignment.START
@@ -247,12 +254,13 @@ def ConsumidorView(page: ft.Page) -> None:
                 ),
                 ft.Container(
                     content=ft.Column(
-                        spacing=20,
+                        spacing=40,
                         controls=[
-                            tab
+                            tab,
+                            cuenta
                         ]
                     ),
-                    width=260,
+                    width=270,
                     height=500
                 )
             ]
