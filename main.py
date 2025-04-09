@@ -1,6 +1,7 @@
 import flet as ft
 from producto import Producto
 from pedido import Pedido
+from queries import Query
 
 def main(page: ft.Page) -> None:
     # General settings of the window
@@ -147,7 +148,6 @@ def administradorView(page: ft.Page)->None:
 
 def ConsumidorView(page: ft.Page) -> None:
     page.title = 'Creación de pedido'
-    page.theme_mode = ft.ThemeMode.SYSTEM
     page.vertical_alignment = ft.MainAxisAlignment.START
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     
@@ -187,8 +187,20 @@ def ConsumidorView(page: ft.Page) -> None:
             )
         return options
     
-    def addRow(e) -> None:
+    def crearPedido(e)->None:
+        #Query.sendPackage(carro)
+        tab.rows.clear()
+        Pedido.elementos.clear()
+        for element in carro:
+            element.cantidad = 0 
         
+        cuenta.text_align= ft.alignment.center_right
+        cuenta.value = '\n\n\n\n\n\n\n\n\n\n\t\t\t\tPEDIDO CREADO EXITOSAMENTE'   
+        tab.visible = False
+        enviar.visible = False
+        page.update()
+    
+    def addRow(e) -> None:
         cantidad = 0
         x = False
         if selector.value == "REBANADA DE PASTEL":
@@ -223,6 +235,7 @@ def ConsumidorView(page: ft.Page) -> None:
         if selector.value is not None and x:
             tab.visible = True
             cuenta.visible = True
+            enviar.visible = True 
             tab.rows.append(
                 ft.DataRow(
                     cells=[
@@ -233,7 +246,7 @@ def ConsumidorView(page: ft.Page) -> None:
             )
         elif selector.value is not None:
             if selector.value == "REBANADA DE PASTEL":
-                tab.rows[pastel.id-1].cells[1] = ft.DataCell(ft.Text(value=str(pastel.cantidad)))
+                tab.rows[pastel.id-1].cells[1] = ft.DataCell(ft.Text(value=str(pastel.cantidad)))           
             elif selector.value == 'REBANADA DE FLAN':
                 tab.rows[flan.id-1].cells[1] = ft.DataCell(ft.Text(value=str(flan.cantidad)))
             elif selector.value == 'DOCENA DE GALLETAS':
@@ -263,12 +276,18 @@ def ConsumidorView(page: ft.Page) -> None:
     
     tab = ft.DataTable(
         visible= False,
-        heading_row_color=ft.Colors.GREY_100,
+        heading_row_color=ft.Colors.GREY_200,
         columns=[
             ft.DataColumn(ft.Text(value='Producto')),
             ft.DataColumn(ft.Text(value='Cantidad'), numeric=True)
         ],
         rows=[]
+    )
+    enviar = ft.Button(
+        text='CREAR PEDIDO',
+        width = 240,
+        on_click= crearPedido,
+        visible= False
     )
     
     cuenta = ft.Text(
@@ -284,12 +303,12 @@ def ConsumidorView(page: ft.Page) -> None:
                 ft.Container(
                     padding=40,
                     content=ft.Column(
-                        spacing=40,
+                        spacing=30,
                         controls=[
                             ft.DataTable(
                                 heading_row_height=70,
                                 data_row_min_height=50.0,
-                                heading_row_color=ft.Colors.GREY_100,
+                                heading_row_color=ft.Colors.GREY_200,
                                 columns=[
                                     ft.DataColumn(ft.Text("POSTRE")),
                                     ft.DataColumn(ft.Text("SABORES")),
@@ -328,7 +347,7 @@ def ConsumidorView(page: ft.Page) -> None:
                             ),
                             ft.DataTable(
                                 heading_row_height=70,
-                                heading_row_color=ft.Colors.GREY_100,
+                                heading_row_color=ft.Colors.GREY_200,
                                 columns=[
                                     ft.DataColumn(ft.Text("BEBIDA")),
                                     ft.DataColumn(ft.Text("SABORES")),
@@ -362,7 +381,7 @@ def ConsumidorView(page: ft.Page) -> None:
                         alignment=ft.MainAxisAlignment.START,
                         horizontal_alignment=ft.CrossAxisAlignment.START,
                     ),
-                    width=600,
+                    width=580,
                 ),
                 ft.Container(
                     content=ft.Column(
@@ -383,7 +402,8 @@ def ConsumidorView(page: ft.Page) -> None:
                         spacing=40,
                         controls=[
                             tab,
-                            cuenta
+                            cuenta,
+                            enviar
                         ]
                     ),
                     width=270,
