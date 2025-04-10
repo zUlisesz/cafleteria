@@ -5,6 +5,7 @@ from queries import Query
 
 def main(page: ft.Page) -> None:
     # General settings of the window
+    page.clean()
     page.scroll = 'always'
     page.title = 'Main Window'
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
@@ -48,7 +49,7 @@ def main(page: ft.Page) -> None:
                                     )
                                 ),
                                 ft.ElevatedButton(
-                                    on_click = lambda e: administradorView(page) ,
+                                    on_click = lambda e: login(page) ,
                                     text='ADMINISTRADOR', 
                                     color=ft.Colors.BLACK, 
                                     bgcolor=ft.Colors.BLUE_GREY_200, 
@@ -97,7 +98,7 @@ def main(page: ft.Page) -> None:
         )
     )
     
-def administradorView(page: ft.Page)->None:
+def login(page: ft.Page)->None:
     page.controls.clear()
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
@@ -106,13 +107,7 @@ def administradorView(page: ft.Page)->None:
         codes = ['pass', 'password', 'unlocked','may i pass']
         if string in codes :
             page.clean()
-            page.add(
-                ft.Text(
-                    value = 'HAS ACCEDIO COMO ADMINISTRADOR',
-                    size= 40 ,
-                    weight = ft.FontWeight.BOLD
-                )
-            )
+            administradorView(page)
         else:
             letrero.value = '               CONTARASEÑA INCORRECTA'
             password.value = ''
@@ -188,7 +183,7 @@ def ConsumidorView(page: ft.Page) -> None:
         return options
     
     def crearPedido(e)->None:
-        #Query.sendPackage(carro)
+        Query.sendPackage(carro)
         tab.rows.clear()
         Pedido.elementos.clear()
         for element in carro:
@@ -389,7 +384,8 @@ def ConsumidorView(page: ft.Page) -> None:
                         controls=[
                             ft.Text(value='AÑADA LOS ALIMENTOS DE SU AGRADO', weight=ft.FontWeight.W_500),
                             selector,
-                            ft.ElevatedButton(text='AÑADIR AL CARRITO', on_click=addRow, width=270)
+                            ft.ElevatedButton(text='AÑADIR AL CARRITO', on_click=addRow, width=270),
+                            ft.ElevatedButton(text='VOLVER AL INICIO',width=270, on_click= lambda e: main(page) )
                         ],
                         alignment=ft.MainAxisAlignment.START,
                         horizontal_alignment=ft.CrossAxisAlignment.START
@@ -415,4 +411,43 @@ def ConsumidorView(page: ft.Page) -> None:
     
     page.update()
 
+def administradorView(page:ft.Page)-> None:
+    page.vertical_alignment = ft.MainAxisAlignment.CENTER
+    page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
+    #page.scroll = 'adaptive'
+    rows = Query.getAll()
+    
+    tab = ft.DataTable(
+        heading_row_color= ft.Colors.GREY_200,
+        columns=[
+            ft.DataColumn(ft.Text(value = 'ID PEDIDO')),
+            ft.DataColumn(ft.Text(value = 'PASTEL')),
+            ft.DataColumn(ft.Text(value = 'FLAN')),
+            ft.DataColumn(ft.Text(value = 'GALLETAS')),
+            ft.DataColumn(ft.Text(value = 'BROWNIE')),
+            ft.DataColumn(ft.Text(value = 'AMERICANO')),
+            ft.DataColumn(ft.Text(value = 'MALTEADA')),
+            ft.DataColumn(ft.Text(value = 'SMOOTHIE')),
+            ft.DataColumn(ft.Text(value = 'FECHA')),
+            ft.DataColumn(ft.Text(value = 'TOTAL'))
+        ],
+        rows = [
+            ft.DataRow(
+                cells=[ft.DataCell(ft.Text(str(cell))) for cell in row]
+            )
+            for row in rows
+    ]
+    )
+    page.add(
+        ft.Column(
+            spacing = 40,
+            controls=[
+                ft.Text(value = 'BIENVENIDO A LA SECCIÓN DE VENTAS, ADMINISTRADOR', weight= ft.FontWeight.W_400, size= 20 ), 
+                tab,
+                ft.Text(value = 'VENTAS TOTALES: $ {}'.format(Query.getVentasTotales()),weight= ft.FontWeight.W_600, size= 14),
+                ft.ElevatedButton(text= 'VOLVER AL INICIO',on_click= lambda e: main(page))
+            ]
+        )
+    )
+    
 ft.app(target=main)
